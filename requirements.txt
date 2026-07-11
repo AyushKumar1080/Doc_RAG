@@ -18,3 +18,5 @@ pandas
 python-dotenv
 tqdm
 huggingface-hub
+
+streamlit
