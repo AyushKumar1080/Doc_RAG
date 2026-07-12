@@ -1,4 +1,3 @@
-from langchain_huggingface import HuggingFaceEmbeddings
 from splitter import split_document
 from langchain_community.vectorstores import FAISS
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
