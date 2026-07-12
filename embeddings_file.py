@@ -1,11 +1,12 @@
 from langchain_huggingface import HuggingFaceEmbeddings
 from splitter import split_document
 from langchain_community.vectorstores import FAISS
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
+from dotenv import load_dotenv
 
-embedding_model = HuggingFaceEmbeddings(
-    model_name="BAAI/bge-small-en-v1.5",
-    model_kwargs={"device": "cpu"},
-    encode_kwargs={"normalize_embeddings": True}
+load_dotenv()
+embedding_model = GoogleGenerativeAIEmbeddings(
+    model="gemini-embedding-001"
 )
 
 def build_vector_store(file_path):
