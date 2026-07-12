@@ -13,7 +13,7 @@ def load_document(file_path):
     elif extension == '.txt':
         loader = TextLoader(file_path)
     elif extension == '.docx':
-        loader == Docx2txtLoader(file_path)
+        loader = Docx2txtLoader(file_path)
     else:
         raise ValueError(f"This file type not supported by application: {extension}")
     
