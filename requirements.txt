@@ -10,7 +10,7 @@ langchain-community
 langchain-core
 langchain-text-splitters
 langchain-groq
-langchain-google-genai
+fastembed
 
 faiss-cpu
 
