@@ -7,6 +7,9 @@ splitter = RecursiveCharacterTextSplitter(
 )
 
 def split_document(file_path):
+    """
+    Load a document and split it into chunks.
+    """
     documents = load_document(file_path)
     chunks = splitter.split_documents(documents)
     return chunks
