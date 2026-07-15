@@ -21,23 +21,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-vector_store = None
-retriever = None
-
 ALLOWED_EXTENSIONS = {".pdf", ".txt", ".csv", ".docx"}
+
+retrievers = {}
+
+UPLOAD_DIR = "uploads"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @app.post("/upload")
 
-async def upload_document(file: UploadFile = File(...)):
+async def upload_document(thread_id: str = Form(...),file: UploadFile = File(...)):
 
-    global vector_store,retriever
     extension = os.path.splitext(file.filename)[1].lower()
     
     if extension not in ALLOWED_EXTENSIONS:
         raise HTTPException(status_code=400, detail = f"Unsupported file type: {extension}")
     
-    os.makedirs("uploads", exist_ok=True)
-    file_path = os.path.join("uploads",file.filename)
+    file_path = os.path.join(UPLOAD_DIR,f"{thread_id}_{file.filename}")
 
     with open(file_path, "wb") as f:
         shutil.copyfileobj(file.file, f)
@@ -47,13 +47,9 @@ async def upload_document(file: UploadFile = File(...)):
     try:
         vector_store = build_vector_store(file_path)
         
-        retriever = vector_store.as_retriever(
+        retrievers[thread_id] = vector_store.as_retriever(
             search_type="mmr",
-            search_kwargs={
-                "k":4,
-                "fetch_k":16,
-                "lambda_mult":0.5
-            }
+            search_kwargs={"k":4,"fetch_k":16,"lambda_mult":0.5}
         )
         
     except Exception:
@@ -68,25 +64,18 @@ async def upload_document(file: UploadFile = File(...)):
 
 @app.post("/ask")
 
-async def ask_question(question: str = Form(...)):
+async def ask_question(question: str = Form(...), thread_id: str = Form(...)):
 
-    global retriever
+    retriever = retrievers.get(thread_id)
 
     if retriever is None:
         raise HTTPException(status_code=400,detail="Please upload a document first.")
 
     docs = retriever.invoke(question)
 
-    context = "\n\n".join(
-        doc.page_content for doc in docs
-    )
+    context = "\n\n".join(doc.page_content for doc in docs)
 
-    answer = chain.invoke({
-        "context":context,
-        "question":question
+    answer = chain.invoke({"context":context, "question":question
     })
 
-    return {
-        "answer":answer,
-        "chunks":[doc.page_content for doc in docs]
-    }
+    return {"answer":answer, "chunks":[doc.page_content for doc in docs]}
