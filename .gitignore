@@ -1,1 +1,15 @@
+# Environment Variables
 .env
+
+# Python Cache
+__pycache__/
+*.pyc
+
+# VS Code Temporary File
+tempCodeRunnerFile.py
+
+# Uploaded Files
+uploads/
+
+# Jupyter Notebook
+demo.ipynb
